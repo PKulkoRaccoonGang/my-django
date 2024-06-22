@@ -1,4 +1,5 @@
 from django.db import models
+from django.urls import reverse
 
 
 class News(models.Model):
@@ -9,6 +10,9 @@ class News(models.Model):
     photo = models.ImageField(upload_to='photos/%Y/%m/%d/', blank=True, verbose_name='Photo')
     is_published = models.BooleanField(default=True, verbose_name='Is published?')
     category = models.ForeignKey('Category', on_delete=models.PROTECT, null=True, verbose_name='Category')
+
+    def get_absolute_url(self):
+        return reverse('view_news', kwargs={'news_id': self.pk})
 
     def my_func(self):
         return 'Hello from modal'
@@ -24,6 +28,9 @@ class News(models.Model):
 
 class Category(models.Model):
     title = models.CharField(max_length=150, db_index=True, verbose_name='Title')
+
+    def get_absolute_url(self):
+        return reverse('category', kwargs={'category_id': self.pk})
 
     def __str__(self):
         return self.title
