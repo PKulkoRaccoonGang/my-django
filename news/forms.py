@@ -1,27 +1,21 @@
 from django import forms
-from .models import Category
+from .models import News
+
+import re
 
 
-class NewsForm(forms.Form):
-    title = forms.CharField(
-        max_length=150,
-        label='Title',
-        widget=forms.TextInput(attrs={'class': 'form-control mb-2'})
-    )
-    content = forms.CharField(
-        label='Content',
-        required=False,
-        widget=forms.Textarea(attrs={'class': 'form-control mb-2', 'rows': 5}),
-    )
-    is_published = forms.BooleanField(
-        label='Published',
-        initial=True,
-        required=False,
-        widget=forms.CheckboxInput(attrs={'class': 'form-check-input mb-2'})
-    )
-    category = forms.ModelChoiceField(
-        empty_label=None,
-        label='Choose category',
-        queryset=Category.objects.all(),
-        widget=forms.Select(attrs={'class': 'form-control mb-2'})
-    )
+class NewsForm(forms.ModelForm):
+    class Meta:
+        model = News
+        fields = ['title', 'content', 'is_published', 'category']
+        widgets = {
+            'title': forms.TextInput(attrs={'class': 'form-control mb-2'}),
+            'content': forms.Textarea(attrs={'class': 'form-control mb-2', 'rows': 5}),
+            'category': forms.Select(attrs={'class': 'form-control mb-2'})
+        }
+
+    def clean_title(self):
+        title = self.cleaned_data['title']
+        if re.match(r'\d', title):
+            raise forms.ValidationError('Title should not contain numbers')
+        return title
