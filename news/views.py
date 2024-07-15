@@ -16,16 +16,7 @@ class HomeNews(ListView):
         return context
 
     def get_queryset(self):
-        return News.objects.filter(is_published=True)
-
-
-# def index(request):
-#     news = News.objects.order_by('-created_at')
-#     context = {
-#         'news': news,
-#         'title': 'News list',
-#     }
-#     return render(request, 'news/index.html', context)
+        return News.objects.filter(is_published=True).select_related('category')
 
 
 class NewsByCategory(ListView):
@@ -40,41 +31,15 @@ class NewsByCategory(ListView):
         return context
 
     def get_queryset(self):
-        return News.objects.filter(category_id=self.kwargs['category_id'], is_published=True)
+        return News.objects.filter(category_id=self.kwargs['category_id'], is_published=True).select_related('category')
 
-
-# def get_category(request, category_id):
-#     news = News.objects.filter(category_id=category_id)
-#     category = Category.objects.get(pk=category_id)
-#     context = {
-#         'news': news,
-#         'category': category,
-#     }
-#     return render(request, 'news/category.html', context)
 
 class ViewNews(DetailView):
     model = News
     context_object_name = 'news_item'
 
 
-# def view_news(request, news_id):
-#     news_item = get_object_or_404(News, pk=news_id)
-#     return render(request, 'news/view_news.html', context={'news_item': news_item})
-
 class CreateNews(CreateView):
     form_class = NewsForm
     template_name = 'news/add_news.html'
     success_url = reverse_lazy('home')
-
-
-#
-# def add_news(request):
-#     if request.method == 'POST':
-#         form = NewsForm(request.POST, request.FILES)
-#         if form.is_valid():
-#             # news = News.objects.create(**form.cleaned_data)
-#             news = form.save()
-#             return redirect(news)
-#     else:
-#         form = NewsForm()
-#     return render(request, 'news/add_news.html', context={'form': form})
